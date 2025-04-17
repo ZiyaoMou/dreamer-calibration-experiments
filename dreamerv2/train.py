@@ -29,7 +29,7 @@ import common
 
 def main():
 
-  configs = yaml.safe_load((
+  configs = yaml.YAML(typ='safe', pure=True).load((
       pathlib.Path(sys.argv[0]).parent / 'configs.yaml').read_text())
   parsed, remaining = common.Flags(configs=['defaults']).parse(known_only=True)
   config = common.Config(configs['defaults'])

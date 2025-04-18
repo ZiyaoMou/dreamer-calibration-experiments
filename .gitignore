@@ -5,5 +5,3 @@ dist
 MUJOCO_LOG.TXT
 gym-0.19.0/
 log/
-sh
-sh.pub

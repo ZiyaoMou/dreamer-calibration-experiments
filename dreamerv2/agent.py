@@ -84,7 +84,7 @@ class WorldModel(common.Module):
     shapes = {k: tuple(v.shape) for k, v in obs_space.items()}
     self.config = config
     self.tfstep = tfstep
-    self.rssm = common.EnsembleRSSM(**config.rssm)
+    self.rssm = common.EnsembleRSSM(tfstep=self.tfstep, **config.rssm)
     self.encoder = common.Encoder(shapes, **config.encoder)
     self.heads = {}
     self.heads['decoder'] = common.Decoder(shapes, **config.decoder)

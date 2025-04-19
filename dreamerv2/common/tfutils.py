@@ -116,10 +116,22 @@ class Optimizer(tf.Module):
     if self._mixed:
       metrics[f'{self._name}_loss_scale'] = self._opt.loss_scale
 
+    grads = [g if g is not None else tf.zeros_like(v, dtype=tf.float32) for g, v in zip(grads, varibs)]
+
     # Distributed sync.
     context = tf.distribute.get_replica_context()
     if context:
       grads = context.all_reduce('mean', grads)
+
+    float_pairs = [
+       (g, v) for g, v in zip(grads, varibs)
+       if v.dtype.is_floating
+    ]
+
+    if float_pairs:
+         grads, varibs = zip(*float_pairs)
+    else:
+         grads, varibs = [], []
 
     # Gradient clipping.
     norm = tf.linalg.global_norm(grads)
@@ -148,4 +160,8 @@ class Optimizer(tf.Module):
       if re.search(self._wd_pattern, self._name + '/' + var.name):
         if nontrivial:
           print('- ' + self._name + '/' + var.name)
-        var.assign((1 - self._wd) * var)
+        # var.assign((1 - self._wd) * var)
+        if not var.dtype.is_floating:
+          continue
+        var.assign((1 - self._wd) * var, read_value=False)
+

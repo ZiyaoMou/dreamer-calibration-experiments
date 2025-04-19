@@ -145,7 +145,14 @@ class WorldModel(common.Module):
       feat = self.rssm.get_feat(state)
       for key, value in {**state, 'action': action, 'feat': feat}.items():
         seq[key].append(value)
-    seq = {k: tf.stack(v, 0) for k, v in seq.items()}
+    # seq = {k: tf.stack(v, 0) for k, v in seq.items()}
+    policy_dtype = tf.keras.mixed_precision.global_policy().compute_dtype
+
+    seq = {
+      k: tf.stack([tf.cast(x, policy_dtype) for x in v], 0)
+      for k, v in seq.items()
+    }
+
     if 'discount' in self.heads:
       disc = self.heads['discount'](seq['feat']).mean()
       if is_terminal is not None:

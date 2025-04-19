@@ -120,6 +120,7 @@ class EnsembleRSSM(common.Module):
         x = self.get('obs_out', tfkl.Dense, self._hidden)(x)
         x = self.get('obs_out_norm', NormLayer, self._norm)(x)
         x = self._act(x)
+        x = tf.cast(x, tf.keras.mixed_precision.global_policy().compute_dtype)
         stats = self._suff_stats_layer('obs_dist', x)
         dist = self.get_dist(stats)
         stoch = dist.sample() if sample else dist.mode()
@@ -137,6 +138,7 @@ class EnsembleRSSM(common.Module):
         x = self.get('img_in', tfkl.Dense, self._hidden)(x)
         x = self.get('img_in_norm', NormLayer, self._norm)(x)
         x = self._act(x)
+        x = tf.cast(x, tf.keras.mixed_precision.global_policy().compute_dtype)
         deter = prev_state['deter']
         x, deter = self._cell(x, [deter])
         deter = deter[0]  # Keras wraps the state in a list.

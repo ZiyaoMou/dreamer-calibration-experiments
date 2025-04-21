@@ -1,0 +1,300 @@
+Mon Apr 21 00:15:15 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 560.35.03              Driver Version: 560.35.03      CUDA Version: 12.6     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA L40S                    On  |   00000000:03:00.0 Off |                    0 |
+| N/A   33C    P8             33W /  350W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA L40S                    On  |   00000000:04:00.0 Off |                    0 |
+| N/A   33C    P8             32W /  350W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA L40S                    On  |   00000000:64:00.0 Off |                    0 |
+| N/A   33C    P8             32W /  350W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA L40S                    On  |   00000000:83:00.0 Off |                    0 |
+| N/A   34C    P8             32W /  350W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+
+Config:
+logdir:                     log/cal_logdir/atari_pong/dreamerv2/1  (str)
+seed:                       0                                      (int)
+task:                       atari_pong                             (str)
+envs:                       1                                      (int)
+envs_parallel:              none                                   (str)
+render_size:                [64, 64]                               (ints)
+dmc_camera:                 -1                                     (int)
+atari_grayscale:            True                                   (bool)
+time_limit:                 27000                                  (int)
+action_repeat:              4                                      (int)
+steps:                      500000.0                               (float)
+log_every:                  10000.0                                (float)
+eval_every:                 250000.0                               (float)
+eval_eps:                   1                                      (int)
+prefill:                    50000                                  (int)
+pretrain:                   1                                      (int)
+train_every:                2000                                   (int)
+train_steps:                1                                      (int)
+expl_until:                 0                                      (int)
+replay.capacity:            2000000.0                              (float)
+replay.ongoing:             False                                  (bool)
+replay.minlen:              50                                     (int)
+replay.maxlen:              50                                     (int)
+replay.prioritize_ends:     True                                   (bool)
+dataset.batch:              16                                     (int)
+dataset.length:             50                                     (int)
+log_keys_video:             [image]                                (strs)
+log_keys_sum:               ^$                                     (str)
+log_keys_mean:              ^$                                     (str)
+log_keys_max:               ^$                                     (str)
+precision:                  16                                     (int)
+jit:                        True                                   (bool)
+clip_rewards:               tanh                                   (str)
+expl_behavior:              greedy                                 (str)
+expl_noise:                 0.0                                    (float)
+eval_noise:                 0.0                                    (float)
+eval_state_mean:            False                                  (bool)
+grad_heads:                 [decoder, reward, discount]            (strs)
+pred_discount:              True                                   (bool)
+rssm.ensemble:              1                                      (int)
+rssm.hidden:                600                                    (int)
+rssm.deter:                 600                                    (int)
+rssm.stoch:                 32                                     (int)
+rssm.discrete:              32                                     (int)
+rssm.act:                   elu                                    (str)
+rssm.norm:                  none                                   (str)
+rssm.std_act:               sigmoid2                               (str)
+rssm.min_std:               0.1                                    (float)
+rssm.calibrate_mode:        global                                 (str)
+rssm.temperature_init:      1.0                                    (float)
+rssm.temperature_schedule:  0.8                                    (float)
+encoder.mlp_keys:           $^                                     (str)
+encoder.cnn_keys:           image                                  (str)
+encoder.act:                elu                                    (str)
+encoder.norm:               none                                   (str)
+encoder.cnn_depth:          48                                     (int)
+encoder.cnn_kernels:        [4, 4, 4, 4]                           (ints)
+encoder.mlp_layers:         [400, 400, 400, 400]                   (ints)
+decoder.mlp_keys:           $^                                     (str)
+decoder.cnn_keys:           image                                  (str)
+decoder.act:                elu                                    (str)
+decoder.norm:               none                                   (str)
+decoder.cnn_depth:          48                                     (int)
+decoder.cnn_kernels:        [5, 5, 6, 6]                           (ints)
+decoder.mlp_layers:         [400, 400, 400, 400]                   (ints)
+reward_head.layers:         4                                      (int)
+reward_head.units:          400                                    (int)
+reward_head.act:            elu                                    (str)
+reward_head.norm:           none                                   (str)
+reward_head.dist:           mse                                    (str)
+discount_head.layers:       4                                      (int)
+discount_head.units:        400                                    (int)
+discount_head.act:          elu                                    (str)
+discount_head.norm:         none                                   (str)
+discount_head.dist:         binary                                 (str)
+loss_scales.kl:             0.1                                    (float)
+loss_scales.reward:         1.0                                    (float)
+loss_scales.discount:       5.0                                    (float)
+loss_scales.proprio:        1.0                                    (float)
+kl.free:                    0.0                                    (float)
+kl.forward:                 False                                  (bool)
+kl.balance:                 0.8                                    (float)
+kl.free_avg:                True                                   (bool)
+model_opt.opt:              adam                                   (str)
+model_opt.lr:               0.0002                                 (float)
+model_opt.eps:              1e-05                                  (float)
+model_opt.clip:             100                                    (int)
+model_opt.wd:               1e-06                                  (float)
+actor.layers:               4                                      (int)
+actor.units:                400                                    (int)
+actor.act:                  elu                                    (str)
+actor.norm:                 none                                   (str)
+actor.dist:                 auto                                   (str)
+actor.min_std:              0.1                                    (float)
+critic.layers:              4                                      (int)
+critic.units:               400                                    (int)
+critic.act:                 elu                                    (str)
+critic.norm:                none                                   (str)
+critic.dist:                mse                                    (str)
+actor_opt.opt:              adam                                   (str)
+actor_opt.lr:               4e-05                                  (float)
+actor_opt.eps:              1e-05                                  (float)
+actor_opt.clip:             100                                    (int)
+actor_opt.wd:               1e-06                                  (float)
+critic_opt.opt:             adam                                   (str)
+critic_opt.lr:              0.0001                                 (float)
+critic_opt.eps:             1e-05                                  (float)
+critic_opt.clip:            100                                    (int)
+critic_opt.wd:              1e-06                                  (float)
+discount:                   0.999                                  (float)
+discount_lambda:            0.95                                   (float)
+imag_horizon:               15                                     (int)
+actor_grad:                 auto                                   (str)
+actor_grad_mix:             0.1                                    (float)
+actor_ent:                  0.001                                  (float)
+slow_target:                True                                   (bool)
+slow_target_update:         100                                    (int)
+slow_target_fraction:       1                                      (int)
+slow_baseline:              True                                   (bool)
+reward_norm.momentum:       1.0                                    (float)
+reward_norm.scale:          1.0                                    (float)
+reward_norm.eps:            1e-08                                  (float)
+expl_intr_scale:            1.0                                    (float)
+expl_extr_scale:            0.0                                    (float)
+expl_opt.opt:               adam                                   (str)
+expl_opt.lr:                0.0003                                 (float)
+expl_opt.eps:               1e-05                                  (float)
+expl_opt.clip:              100                                    (int)
+expl_opt.wd:                1e-06                                  (float)
+expl_head.layers:           4                                      (int)
+expl_head.units:            400                                    (int)
+expl_head.act:              elu                                    (str)
+expl_head.norm:             none                                   (str)
+expl_head.dist:             mse                                    (str)
+expl_reward_norm.momentum:  1.0                                    (float)
+expl_reward_norm.scale:     1.0                                    (float)
+expl_reward_norm.eps:       1e-08                                  (float)
+disag_target:               stoch                                  (str)
+disag_log:                  False                                  (bool)
+disag_models:               10                                     (int)
+disag_offset:               1                                      (int)
+disag_action_cond:          True                                   (bool)
+expl_model_loss:            kl                                     (str) 
+
+Logdir log/cal_logdir/atari_pong/dreamerv2/1
+Create envs.
+Prefill dataset (50000 steps).
+Train episode has 898 steps and return -21.0.
+[3592] train_return -21 / train_length 898 / train_total_steps 898 / train_total_episodes 1 / train_loaded_steps 898 / train_loaded_episodes 1
+Train episode has 822 steps and return -21.0.
+[6880] train_return -21 / train_length 822 / train_total_steps 1720 / train_total_episodes 2 / train_loaded_steps 822 / train_loaded_episodes 1
+Train episode has 825 steps and return -21.0.
+[10180] train_return -21 / train_length 825 / train_total_steps 2545 / train_total_episodes 3 / train_loaded_steps 825 / train_loaded_episodes 1
+Train episode has 880 steps and return -21.0.
+[13700] train_return -21 / train_length 880 / train_total_steps 3425 / train_total_episodes 4 / train_loaded_steps 880 / train_loaded_episodes 1
+Train episode has 972 steps and return -20.0.
+[17588] train_return -20 / train_length 972 / train_total_steps 4397 / train_total_episodes 5 / train_loaded_steps 972 / train_loaded_episodes 1
+Train episode has 821 steps and return -21.0.
+[20872] train_return -21 / train_length 821 / train_total_steps 5218 / train_total_episodes 6 / train_loaded_steps 821 / train_loaded_episodes 1
+Train episode has 980 steps and return -20.0.
+[24792] train_return -20 / train_length 980 / train_total_steps 6198 / train_total_episodes 7 / train_loaded_steps 980 / train_loaded_episodes 1
+Train episode has 831 steps and return -20.0.
+[28116] train_return -20 / train_length 831 / train_total_steps 7029 / train_total_episodes 8 / train_loaded_steps 831 / train_loaded_episodes 1
+Train episode has 760 steps and return -21.0.
+[31156] train_return -21 / train_length 760 / train_total_steps 7789 / train_total_episodes 9 / train_loaded_steps 760 / train_loaded_episodes 1
+Train episode has 982 steps and return -21.0.
+[35084] train_return -21 / train_length 982 / train_total_steps 8771 / train_total_episodes 10 / train_loaded_steps 982 / train_loaded_episodes 1
+Train episode has 818 steps and return -21.0.
+[38356] train_return -21 / train_length 818 / train_total_steps 9589 / train_total_episodes 11 / train_loaded_steps 818 / train_loaded_episodes 1
+Train episode has 818 steps and return -21.0.
+[41628] train_return -21 / train_length 818 / train_total_steps 1e4 / train_total_episodes 12 / train_loaded_steps 818 / train_loaded_episodes 1
+Train episode has 806 steps and return -21.0.
+[44852] train_return -21 / train_length 806 / train_total_steps 1.1e4 / train_total_episodes 13 / train_loaded_steps 806 / train_loaded_episodes 1
+Train episode has 820 steps and return -21.0.
+[48132] train_return -21 / train_length 820 / train_total_steps 1.2e4 / train_total_episodes 14 / train_loaded_steps 820 / train_loaded_episodes 1
+Train episode has 883 steps and return -21.0.
+[51664] train_return -21 / train_length 883 / train_total_steps 1.3e4 / train_total_episodes 15 / train_loaded_steps 883 / train_loaded_episodes 1
+Train episode has 977 steps and return -19.0.
+[55572] train_return -19 / train_length 977 / train_total_steps 1.4e4 / train_total_episodes 16 / train_loaded_steps 977 / train_loaded_episodes 1
+Train episode has 823 steps and return -21.0.
+[58864] train_return -21 / train_length 823 / train_total_steps 1.5e4 / train_total_episodes 17 / train_loaded_steps 823 / train_loaded_episodes 1
+Train episode has 972 steps and return -21.0.
+[62752] train_return -21 / train_length 972 / train_total_steps 1.6e4 / train_total_episodes 18 / train_loaded_steps 972 / train_loaded_episodes 1
+Train episode has 897 steps and return -21.0.
+[66340] train_return -21 / train_length 897 / train_total_steps 1.7e4 / train_total_episodes 19 / train_loaded_steps 897 / train_loaded_episodes 1
+Train episode has 923 steps and return -20.0.
+[70032] train_return -20 / train_length 923 / train_total_steps 1.8e4 / train_total_episodes 20 / train_loaded_steps 923 / train_loaded_episodes 1
+Train episode has 978 steps and return -19.0.
+[73944] train_return -19 / train_length 978 / train_total_steps 1.8e4 / train_total_episodes 21 / train_loaded_steps 978 / train_loaded_episodes 1
+Train episode has 1180 steps and return -19.0.
+[78664] train_return -19 / train_length 1180 / train_total_steps 2e4 / train_total_episodes 22 / train_loaded_steps 1180 / train_loaded_episodes 1
+Train episode has 929 steps and return -20.0.
+[82380] train_return -20 / train_length 929 / train_total_steps 2.1e4 / train_total_episodes 23 / train_loaded_steps 929 / train_loaded_episodes 1
+Train episode has 1117 steps and return -18.0.
+[86848] train_return -18 / train_length 1117 / train_total_steps 2.2e4 / train_total_episodes 24 / train_loaded_steps 1117 / train_loaded_episodes 1
+Train episode has 838 steps and return -21.0.
+[90200] train_return -21 / train_length 838 / train_total_steps 2.3e4 / train_total_episodes 25 / train_loaded_steps 838 / train_loaded_episodes 1
+Train episode has 869 steps and return -21.0.
+[93676] train_return -21 / train_length 869 / train_total_steps 2.3e4 / train_total_episodes 26 / train_loaded_steps 869 / train_loaded_episodes 1
+Train episode has 799 steps and return -21.0.
+[96872] train_return -21 / train_length 799 / train_total_steps 2.4e4 / train_total_episodes 27 / train_loaded_steps 799 / train_loaded_episodes 1
+Train episode has 960 steps and return -20.0.
+[100712] train_return -20 / train_length 960 / train_total_steps 2.5e4 / train_total_episodes 28 / train_loaded_steps 960 / train_loaded_episodes 1
+Train episode has 844 steps and return -21.0.
+[104088] train_return -21 / train_length 844 / train_total_steps 2.6e4 / train_total_episodes 29 / train_loaded_steps 844 / train_loaded_episodes 1
+Train episode has 1080 steps and return -19.0.
+[108408] train_return -19 / train_length 1080 / train_total_steps 2.7e4 / train_total_episodes 30 / train_loaded_steps 1080 / train_loaded_episodes 1
+Train episode has 879 steps and return -21.0.
+[111924] train_return -21 / train_length 879 / train_total_steps 2.8e4 / train_total_episodes 31 / train_loaded_steps 879 / train_loaded_episodes 1
+Train episode has 761 steps and return -21.0.
+[114968] train_return -21 / train_length 761 / train_total_steps 2.9e4 / train_total_episodes 32 / train_loaded_steps 761 / train_loaded_episodes 1
+Train episode has 1144 steps and return -19.0.
+[119544] train_return -19 / train_length 1144 / train_total_steps 3e4 / train_total_episodes 33 / train_loaded_steps 1144 / train_loaded_episodes 1
+Train episode has 931 steps and return -20.0.
+[123268] train_return -20 / train_length 931 / train_total_steps 3.1e4 / train_total_episodes 34 / train_loaded_steps 931 / train_loaded_episodes 1
+Train episode has 1067 steps and return -20.0.
+[127536] train_return -20 / train_length 1067 / train_total_steps 3.2e4 / train_total_episodes 35 / train_loaded_steps 1067 / train_loaded_episodes 1
+Train episode has 930 steps and return -20.0.
+[131256] train_return -20 / train_length 930 / train_total_steps 3.3e4 / train_total_episodes 36 / train_loaded_steps 930 / train_loaded_episodes 1
+Train episode has 930 steps and return -20.0.
+[134976] train_return -20 / train_length 930 / train_total_steps 3.4e4 / train_total_episodes 37 / train_loaded_steps 930 / train_loaded_episodes 1
+Train episode has 1115 steps and return -18.0.
+[139436] train_return -18 / train_length 1115 / train_total_steps 3.5e4 / train_total_episodes 38 / train_loaded_steps 1115 / train_loaded_episodes 1
+Train episode has 820 steps and return -21.0.
+[142716] train_return -21 / train_length 820 / train_total_steps 3.6e4 / train_total_episodes 39 / train_loaded_steps 820 / train_loaded_episodes 1
+Train episode has 882 steps and return -21.0.
+[146244] train_return -21 / train_length 882 / train_total_steps 3.7e4 / train_total_episodes 40 / train_loaded_steps 882 / train_loaded_episodes 1
+Train episode has 1004 steps and return -20.0.
+[150260] train_return -20 / train_length 1004 / train_total_steps 3.8e4 / train_total_episodes 41 / train_loaded_steps 1004 / train_loaded_episodes 1
+Train episode has 759 steps and return -21.0.
+[153296] train_return -21 / train_length 759 / train_total_steps 3.8e4 / train_total_episodes 42 / train_loaded_steps 759 / train_loaded_episodes 1
+Train episode has 823 steps and return -21.0.
+[156588] train_return -21 / train_length 823 / train_total_steps 3.9e4 / train_total_episodes 43 / train_loaded_steps 823 / train_loaded_episodes 1
+Train episode has 986 steps and return -20.0.
+[160532] train_return -20 / train_length 986 / train_total_steps 4e4 / train_total_episodes 44 / train_loaded_steps 986 / train_loaded_episodes 1
+Train episode has 880 steps and return -21.0.
+[164052] train_return -21 / train_length 880 / train_total_steps 4.1e4 / train_total_episodes 45 / train_loaded_steps 880 / train_loaded_episodes 1
+Train episode has 883 steps and return -21.0.
+[167584] train_return -21 / train_length 883 / train_total_steps 4.2e4 / train_total_episodes 46 / train_loaded_steps 883 / train_loaded_episodes 1
+Train episode has 967 steps and return -21.0.
+[171452] train_return -21 / train_length 967 / train_total_steps 4.3e4 / train_total_episodes 47 / train_loaded_steps 967 / train_loaded_episodes 1
+Train episode has 1105 steps and return -19.0.
+[175872] train_return -19 / train_length 1105 / train_total_steps 4.4e4 / train_total_episodes 48 / train_loaded_steps 1105 / train_loaded_episodes 1
+Train episode has 913 steps and return -21.0.
+[179524] train_return -21 / train_length 913 / train_total_steps 4.5e4 / train_total_episodes 49 / train_loaded_steps 913 / train_loaded_episodes 1
+Train episode has 881 steps and return -20.0.
+[183048] train_return -20 / train_length 881 / train_total_steps 4.6e4 / train_total_episodes 50 / train_loaded_steps 881 / train_loaded_episodes 1
+Train episode has 877 steps and return -21.0.
+[186556] train_return -21 / train_length 877 / train_total_steps 4.7e4 / train_total_episodes 51 / train_loaded_steps 877 / train_loaded_episodes 1
+Train episode has 892 steps and return -20.0.
+[190124] train_return -20 / train_length 892 / train_total_steps 4.8e4 / train_total_episodes 52 / train_loaded_steps 892 / train_loaded_episodes 1
+Train episode has 763 steps and return -21.0.
+[193176] train_return -21 / train_length 763 / train_total_steps 4.8e4 / train_total_episodes 53 / train_loaded_steps 763 / train_loaded_episodes 1
+Train episode has 958 steps and return -19.0.
+[197008] train_return -19 / train_length 958 / train_total_steps 4.9e4 / train_total_episodes 54 / train_loaded_steps 958 / train_loaded_episodes 1
+Eval episode has 851 steps and return -21.0.
+[200000] eval_return -21 / eval_length 851 / eval_total_steps 0 / eval_total_episodes 0 / eval_loaded_steps 0 / eval_loaded_episodes 0
+Create agent.
+Encoder CNN inputs: ['image']
+Encoder MLP inputs: []
+Decoder CNN outputs: ['image']
+Decoder MLP outputs: []
+Found 19968181.0 model parameters.
+Found 1133606 actor parameters.
+Found 1131601 critic parameters.
+Pretrain agent.

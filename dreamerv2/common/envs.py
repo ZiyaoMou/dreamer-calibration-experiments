@@ -470,14 +470,24 @@ class ResizeImage:
 
   def step(self, action):
     obs = self._env.step(action)
+    obs = {k: v for k, v in obs.items() if k in self.observation_space.spaces}
+
     for key in self._keys:
       obs[key] = self._resize(obs[key])
     return obs
 
   def reset(self):
     obs = self._env.reset()
+    obs = {k: v for k, v in obs.items() if k in self.observation_space.spaces}
+
     for key in self._keys:
       obs[key] = self._resize(obs[key])
+
+    if isinstance(obs, dict):
+        obs['is_first'] = True
+        obs['is_last'] = False
+        obs['discount'] = 1.0
+
     return obs
 
   def _resize(self, image):
@@ -511,6 +521,12 @@ class RenderImage:
   def step(self, action):
     obs = self._env.step(action)
     obs[self._key] = self._env.render('rgb_array')
+
+    if isinstance(obs, dict):
+        obs['is_first'] = False
+        obs['is_last'] = done  # 如果是 Gym>=0.26，则是 terminated or truncated
+        obs['discount'] = 1.0 - float(done)
+
     return obs
 
   def reset(self):

@@ -1,0 +1,45 @@
+Mon Apr 21 00:14:15 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 560.35.03              Driver Version: 560.35.03      CUDA Version: 12.6     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA L40S                    On  |   00000000:03:00.0 Off |                    0 |
+| N/A   33C    P8             33W /  350W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA L40S                    On  |   00000000:04:00.0 Off |                    0 |
+| N/A   33C    P8             32W /  350W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA L40S                    On  |   00000000:64:00.0 Off |                    0 |
+| N/A   33C    P8             32W /  350W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA L40S                    On  |   00000000:83:00.0 Off |                    0 |
+| N/A   34C    P8             32W /  350W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+Traceback (most recent call last):
+  File "dreamerv2/calibrate.py", line 26, in <module>
+    import agent
+  File "/weka/scratch/enalisn1/ziyao/dreamer-calibration-backup/dreamerv2/agent.py", line 4, in <module>
+    import common
+  File "/weka/scratch/enalisn1/ziyao/dreamer-calibration-backup/dreamerv2/common/__init__.py", line 9, in <module>
+    from .other import *
+  File "/weka/scratch/enalisn1/ziyao/dreamer-calibration-backup/dreamerv2/common/other.py", line 11, in <module>
+    from . import tfutils
+  File "/weka/scratch/enalisn1/ziyao/dreamer-calibration-backup/dreamerv2/common/tfutils.py", line 119
+    <<<<<<< HEAD
+    ^
+SyntaxError: invalid syntax

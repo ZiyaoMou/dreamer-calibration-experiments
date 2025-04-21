@@ -31,7 +31,7 @@ import common
 def main():
 
   configs = yaml.YAML(typ='safe', pure=True).load((
-      pathlib.Path(sys.argv[0]).parent / 'configs.yaml').read_text())
+      pathlib.Path(sys.argv[0]).parent / 'cal-configs.yaml').read_text())
   parsed, remaining = common.Flags(configs=['defaults']).parse(known_only=True)
   config = common.Config(configs['defaults'])
   for name in parsed.configs:
@@ -190,7 +190,7 @@ def main():
     eval_driver(eval_policy, episodes=config.eval_eps)
     print('Start training.')
     train_driver(train_policy, steps=config.eval_every)
-    agnt.save(logdir / 'variables.pkl')
+    agnt.save(logdir / 'platt-variables.pkl')
   for env in train_envs + eval_envs:
     try:
       env.close()

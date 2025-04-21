@@ -48,6 +48,18 @@ class EnsembleRSSM(common.Module):
         self._discrete = discrete
         # New calibration attributes
 
+        self._platt_a = tf.Variable(
+            1.0,
+            dtype=tf.float32,
+            trainable=(calibrate_mode == 'platt'),
+            name='platt_a')
+
+        self._platt_b = tf.Variable(
+            0.0, 
+            dtype=tf.float32,
+            trainable=(calibrate_mode == 'platt'),
+            name='platt_b')
+
 
     def initial(self, batch_size):
         dtype = prec.global_policy().compute_dtype
@@ -163,15 +175,27 @@ class EnsembleRSSM(common.Module):
         if self._discrete and self._calibrate_mode != 'off':
             print('calibration')
             logit = tf.cast(stats['logit'], tf.float32)
+            if self._calibrate_mode == 'platt':
+                # Apply Platt scaling: ax + b transformation
+                # First convert logits to probabilities (with current temperature)
+                T = tf.clip_by_value(tf.cast(self._temperature, tf.float32), 1e-6, 1e6)
+                temp_scaled_logit = logit / T
+                
+                # Then apply the Platt scaling transformation: a*x + b
+                a = tf.clip_by_value(tf.cast(self._platt_a, tf.float32), 1e-6, 1e6)
+                b = tf.cast(self._platt_b, tf.float32)
+                stats['logit'] = a * temp_scaled_logit + b
+            
             if self._calibrate_mode == 'global':
                 T = tf.clip_by_value(
                             tf.cast(self._temperature, tf.float32), 1e-6, 1e6)
+                stats['logit'] = logit / T
             else:  # dynamic schedule
                 step = tf.cast(self._tfstep, tf.float32)
                 frac = tf.clip_by_value(step / 1e6, 0.0, 1.0)
                 T = self._temperature + frac * (
                                tf.cast(0.5, tf.float32) - self._temperature)
-            stats['logit'] = logit / T
+                stats['logit'] = logit / T
 
         dist = self.get_dist(stats)
         stoch = dist.sample() if sample else dist.mode()

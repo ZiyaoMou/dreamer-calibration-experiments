@@ -1,0 +1,115 @@
+Mon Apr 21 14:31:59 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 560.35.03              Driver Version: 560.35.03      CUDA Version: 12.6     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA L40S                    On  |   00000000:03:00.0 Off |                    0 |
+| N/A   34C    P8             33W /  350W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA L40S                    On  |   00000000:64:00.0 Off |                    0 |
+| N/A   35C    P8             32W /  350W |       1MiB /  46068MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+2025-04-21 14:31:59.759086: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
+2025-04-21 14:32:02.605422: I tensorflow/compiler/jit/xla_cpu_device.cc:41] Not creating XLA devices, tf_xla_enable_xla_devices not set
+2025-04-21 14:32:02.606833: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcuda.so.1
+2025-04-21 14:32:02.765056: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1720] Found device 0 with properties: 
+pciBusID: 0000:03:00.0 name: NVIDIA L40S computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 142 deviceMemorySize: 44.42GiB deviceMemoryBandwidth: 804.75GiB/s
+2025-04-21 14:32:02.766675: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1720] Found device 1 with properties: 
+pciBusID: 0000:64:00.0 name: NVIDIA L40S computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 142 deviceMemorySize: 44.42GiB deviceMemoryBandwidth: 804.75GiB/s
+2025-04-21 14:32:02.766691: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
+2025-04-21 14:32:02.769048: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcublas.so.11
+2025-04-21 14:32:02.769083: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcublasLt.so.11
+2025-04-21 14:32:02.770130: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcufft.so.10
+2025-04-21 14:32:02.770641: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcurand.so.10
+2025-04-21 14:32:02.772503: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcusolver.so.10
+2025-04-21 14:32:02.773138: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcusparse.so.11
+2025-04-21 14:32:02.773558: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudnn.so.8
+2025-04-21 14:32:02.778954: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1862] Adding visible gpu devices: 0, 1
+2025-04-21 14:32:02.779215: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX512F
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-04-21 14:32:02.779513: I tensorflow/compiler/jit/xla_gpu_device.cc:99] Not creating XLA devices, tf_xla_enable_xla_devices not set
+2025-04-21 14:32:03.005699: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1720] Found device 0 with properties: 
+pciBusID: 0000:03:00.0 name: NVIDIA L40S computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 142 deviceMemorySize: 44.42GiB deviceMemoryBandwidth: 804.75GiB/s
+2025-04-21 14:32:03.006792: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1720] Found device 1 with properties: 
+pciBusID: 0000:64:00.0 name: NVIDIA L40S computeCapability: 8.9
+coreClock: 2.52GHz coreCount: 142 deviceMemorySize: 44.42GiB deviceMemoryBandwidth: 804.75GiB/s
+2025-04-21 14:32:03.006816: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
+2025-04-21 14:32:03.006840: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcublas.so.11
+2025-04-21 14:32:03.006848: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcublasLt.so.11
+2025-04-21 14:32:03.006855: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcufft.so.10
+2025-04-21 14:32:03.006861: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcurand.so.10
+2025-04-21 14:32:03.006867: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcusolver.so.10
+2025-04-21 14:32:03.006874: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcusparse.so.11
+2025-04-21 14:32:03.006881: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudnn.so.8
+2025-04-21 14:32:03.011305: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1862] Adding visible gpu devices: 0, 1
+2025-04-21 14:32:03.011335: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
+2025-04-21 14:32:03.535746: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1261] Device interconnect StreamExecutor with strength 1 edge matrix:
+2025-04-21 14:32:03.535803: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1267]      0 1 
+2025-04-21 14:32:03.535813: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1280] 0:   N Y 
+2025-04-21 14:32:03.535817: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1280] 1:   Y N 
+2025-04-21 14:32:03.541415: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1406] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 42216 MB memory) -> physical GPU (device: 0, name: NVIDIA L40S, pci bus id: 0000:03:00.0, compute capability: 8.9)
+2025-04-21 14:32:03.543637: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1406] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:1 with 42216 MB memory) -> physical GPU (device: 1, name: NVIDIA L40S, pci bus id: 0000:64:00.0, compute capability: 8.9)
+2025-04-21 14:32:03.904591: W tensorflow/python/util/util.cc:348] Sets are not currently considered sequences, but this may change in the future, so consider avoiding using them.
+2025-04-21 14:32:04.017145: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:116] None of the MLIR optimization passes are enabled (registered 2)
+2025-04-21 14:32:04.028885: I tensorflow/core/platform/profile_utils/cpu_utils.cc:112] CPU Frequency: 2446385000 Hz
+2025-04-21 14:32:04.260707: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudnn.so.8
+2025-04-21 14:32:05.486240: W tensorflow/stream_executor/gpu/asm_compiler.cc:63] Running ptxas --version returned 256
+2025-04-21 14:32:05.598359: W tensorflow/stream_executor/gpu/redzone_allocator.cc:314] Internal: ptxas exited with non-zero error code 256, output: 
+Relying on driver to perform ptx compilation. 
+Modify $PATH to customize ptxas location.
+This message will be only logged once.
+2025-04-21 14:32:07.297172: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcublas.so.11
+2025-04-21 14:32:07.636327: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcublasLt.so.11
+2025-04-21 14:32:16.406875: I tensorflow/stream_executor/cuda/cuda_blas.cc:1838] TensorFloat-32 will be used for the matrix multiplication. This will only be logged once.
+Encoder CNN inputs: ['image']
+Encoder MLP inputs: []
+Decoder CNN outputs: ['image']
+Decoder MLP outputs: []
+Load checkpoint with 85 tensors and 23364990 parameters.
+Encoder CNN inputs: ['image']
+Encoder MLP inputs: []
+Decoder CNN outputs: ['image']
+Decoder MLP outputs: []
+Load checkpoint with 86 tensors and 23364991 parameters.
+Encoder CNN inputs: ['image']
+Encoder MLP inputs: []
+Decoder CNN outputs: ['image']
+Decoder MLP outputs: []
+Load checkpoint with 88 tensors and 23364993 parameters.
+[raw_prob] [[0.03125    0.03125    0.03125    ... 0.03125    0.03125    0.03125   ]
+ [0.03125    0.03125    0.03125    ... 0.03125    0.03125    0.03125   ]
+ [0.03125    0.03125    0.03125    ... 0.03125    0.03125    0.03125   ]
+ ...
+ [0.0260797  0.02203745 0.04163286 ... 0.03500905 0.04460988 0.09425375]
+ [0.02377661 0.03489682 0.04145025 ... 0.05253698 0.01653035 0.03250441]
+ [0.01391804 0.02916469 0.02735695 ... 0.03605429 0.04372789 0.04073552]]
+[cal_prob] [[0.03125    0.03125    0.03125    ... 0.03125    0.03125    0.03125   ]
+ [0.03125    0.03125    0.03125    ... 0.03125    0.03125    0.03125   ]
+ [0.03125    0.03125    0.03125    ... 0.03125    0.03125    0.03125   ]
+ ...
+ [0.02149636 0.04849666 0.04270315 ... 0.04982184 0.02737046 0.03017814]
+ [0.02197923 0.03617348 0.02503139 ... 0.02940455 0.02477833 0.02412277]
+ [0.03337966 0.04933894 0.02852462 ... 0.03849032 0.02465658 0.02569534]]
+[labels] [ 0  0  0 ... 31 29  3]
+[Raw] ECE: 0.9475, Brier Score: 0.9286
+[Calibrated] ECE: 0.0004, Brier Score: 0.9704
+[Platt Calibrated ECE:  0.0017, Brier Score: 0.9703]
+[Raw] Confidence range: 0.031 ~ 0.119
+[Cal] Confidence range: 0.031 ~ 0.119
+[Platt Cal] Confidence range: 0.031 ~ 0.123

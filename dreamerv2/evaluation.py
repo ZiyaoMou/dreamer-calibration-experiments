@@ -139,6 +139,8 @@ def main():
         'log/cal_logdir/variables.pkl', config, obs_space, act_space, step)
     rssm_cal, encoder_cal = load_rssm_from_pkl(
     'log/cal_logdir/atari_pong/dreamerv2/1/variables.pkl', config, obs_space, act_space, step)
+    rssm_platt_cal, encoder_platt_cal = load_rssm_from_pkl(
+    'log/cal_logdir_platt/atari_pong/dreamerv2/1/platt-variables.pkl', config, obs_space, act_space, step)
     
     replay = common.Replay(Path('log/cal_logdir/calib_episodes'), **dict(
         capacity=1000,
@@ -149,24 +151,37 @@ def main():
 
     probs_raw, labels = get_logits_and_labels(rssm_raw, encoder_raw, dataset)
     probs_cal, _ = get_logits_and_labels(rssm_cal, encoder_cal, dataset)
+    probs_platt_cal, _ = get_logits_and_labels(rssm_platt_cal, encoder_platt_cal, dataset)
 
     ece_raw, bins, accs_raw, confs_raw = compute_ece(probs_raw, labels)
     ece_cal, _, accs_cal, confs_cal = compute_ece(probs_cal, labels)
+    ece_platt_cal, _platt, accs_platt_cal, confs_platt_cal = compute_ece(probs_platt_cal, labels)
 
     num_classes = probs_raw.shape[1]
 
-    print(num_classes)
+    print('[raw_prob]', probs_raw)
+    print('[cal_prob]', probs_cal)
+    print('[labels]', labels)
 
     brier_raw = compute_brier_score(probs_raw, labels, num_classes)
     brier_cal = compute_brier_score(probs_cal, labels, num_classes)
+    brier_platt_cal = compute_brier_score(probs_platt_cal, labels, num_classes)
 
     print(f"[Raw] ECE: {ece_raw:.4f}, Brier Score: {brier_raw:.4f}")
     print(f"[Calibrated] ECE: {ece_cal:.4f}, Brier Score: {brier_cal:.4f}")
+    print(f"[Platt Calibrated ECE: {ece_platt_cal: .4f}, Brier Score: {brier_platt_cal:.4f}]")
 
-    print(accs_raw, confs_raw)
-    print(accs_cal, confs_cal)
-    plot_calibration_curve(bins, accs_raw, confs_raw, 'Raw Model Calibration')
-    plot_calibration_curve(bins, accs_cal, confs_cal, 'Calibrated Model Calibration')
+    raw_conf = np.max(probs_raw, axis=1)
+    cal_conf = np.max(probs_cal, axis=1)
+    platt_conf = np.max(probs_platt_cal, axis=1)
+
+    print(f"[Raw] Confidence range: {raw_conf.min():.3f} ~ {raw_conf.max():.3f}")
+    print(f"[Cal] Confidence range: {cal_conf.min():.3f} ~ {cal_conf.max():.3f}")
+    print(f"[Platt Cal] Confidence range: {platt_conf.min():.3f} ~ {platt_conf.max():.3f}")
+
+    plot_calibration_curve(bins, accs_raw, confs_raw, 'Raw Model')
+    plot_calibration_curve(bins, accs_cal, confs_cal, 'Temperature Calibrated Model')
+    plot_calibration_curve(bins, accs_platt_cal, confs_platt_cal, 'Platt Calibrated Model')
 
 if __name__ == '__main__':
   main()

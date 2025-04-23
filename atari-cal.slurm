@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --gres=gpu:4
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=4
+#SBATCH --gres=gpu:1
+#SBATCH --nodes=2
+#SBATCH --cpus-per-task=1
 #SBATCH --mem=16G
 #SBATCH --time=06:00:00
 #SBATCH --job-name=dreamer
@@ -12,5 +12,5 @@
 
 nvidia-smi
 
-python3 dreamerv2/calibrate.py --logdir log/cal_logdir/atari_pong/dreamerv2/1 \
+python3 dreamerv2/calibrate.py --logdir log/cal_logdir_platt/atari_pong/dreamerv2/1 \
   --configs atari --task atari_pong

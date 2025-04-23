@@ -6,4 +6,5 @@ MUJOCO_LOG.TXT
 gym-0.19.0/
 log/
 dreamerv2/__pycache__/
-slurm_output/
+slurm_train_output/
+slurm_cal_output/

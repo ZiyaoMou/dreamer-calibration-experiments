@@ -5,7 +5,7 @@
 #SBATCH --mem=16G
 #SBATCH --time=06:00:00
 #SBATCH --job-name=dreamer
-#SBATCH --output=./slurm_output/%j.out
+#SBATCH --output=./slurm_eval_output/%j.out
 #SBATCH --mail-user=zmou1@jh.edu
 #SBATCH --mail-type=END,FAIL
 

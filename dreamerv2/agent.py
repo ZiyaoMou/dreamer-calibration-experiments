@@ -111,6 +111,12 @@ class WorldModel(common.Module):
     assert len(kl_loss.shape) == 0
     likes = {}
     losses = {'kl': kl_loss}
+    if self.config.rssm.get('calibrate_mode', 'off') != 'off' and self.rssm._discrete:
+      prior_logits = tf.cast(prior['logit'], tf.float32)
+      target_probs = tf.stop_gradient(tf.cast(post['stoch'], tf.float32))  # one-hot target
+      log_probs = tf.nn.log_softmax(prior_logits, axis=-1)
+      calib_nll = -tf.reduce_mean(tf.reduce_sum(target_probs * log_probs, axis=-1))
+      losses['calibration'] = calib_nll
     feat = self.rssm.get_feat(post)
     for name, head in self.heads.items():
       grad_head = (name in self.config.grad_heads)

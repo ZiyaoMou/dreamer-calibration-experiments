@@ -31,7 +31,7 @@ import common
 def main():
 
   configs = yaml.YAML(typ='safe', pure=True).load((
-      pathlib.Path(sys.argv[0]).parent / 'cal-configs.yaml').read_text())
+      pathlib.Path(sys.argv[0]).parent / 'configs.yaml').read_text())
   parsed, remaining = common.Flags(configs=['defaults']).parse(known_only=True)
   config = common.Config(configs['defaults'])
   for name in parsed.configs:
@@ -159,7 +159,7 @@ def main():
   agnt = agent.Agent(config, obs_space, act_space, step)
   train_agent = common.CarryOverState(agnt.train)
   train_agent(next(train_dataset))
-  model_path = Path('log/cal_logdir/variables.pkl')
+  model_path = Path('log/raw_logdir/atari_pong/dreamerv2/1/variables.pkl')
   print(model_path.exists())
   if model_path.exists():
     agnt.load(model_path)

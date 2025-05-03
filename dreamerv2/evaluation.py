@@ -17,6 +17,37 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import os
 
+def compute_entropy(probs):
+    entropy = -np.sum(probs * np.log(probs + 1e-8), axis=-1)
+    return np.mean(entropy), entropy
+
+def plot_entropy_bar(entropies, labels, title='Entropy Comparison'):
+    os.makedirs('evaluation', exist_ok=True)
+    plt.figure(figsize=(7, 5))
+    norm_entropies = (np.array(entropies) - np.min(entropies)) / (np.max(entropies) - np.min(entropies) + 1e-8)
+
+    bars = []
+    for i, (label, val, norm) in enumerate(zip(labels, entropies, norm_entropies)):
+        bar = plt.bar(label, val, color=(1.0, 0.0, 0.0, 0.4 + 0.6 * norm))  # RGBA 中 alpha 从 0.4 到 1.0
+        bars.extend(bar)
+    
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            height + 0.01,
+            f'{height:.4f}',
+            ha='center',
+            va='bottom',
+            fontsize=10
+        )
+    plt.ylabel('Average Entropy')
+    plt.title(title)
+    plt.tight_layout()
+    save_path = os.path.join('evaluation', title.replace(' ', '_') + '.png')
+    plt.savefig(save_path)
+    plt.show()
+
 def get_logits_and_labels(rssm, encoder, dataset, max_batches=100, discrete=True):
     logits_list, labels_list = [], []
 
@@ -108,11 +139,6 @@ def main():
 
     logdir = pathlib.Path('log/logdir/atari_pong/dreamerv2/1').expanduser()
 
-    calib_replay = common.Replay(logdir / 'calib_episodes',
-                                 capacity=1000,
-                                 minlen=config.dataset.length,
-                                 maxlen=config.dataset.length)
-
     def make_env():
         suite, task = config.task.split('_', 1)
         if suite == 'atari':
@@ -136,9 +162,9 @@ def main():
     act_space = train_envs[0].act_space
     obs_space = train_envs[0].obs_space
     rssm_raw, encoder_raw = load_rssm_from_pkl(
-        'log/cal_logdir/variables.pkl', config, obs_space, act_space, step)
+        'log/raw_logdir/atari_pong/dreamerv2/1/variables.pkl', config, obs_space, act_space, step)
     rssm_cal, encoder_cal = load_rssm_from_pkl(
-    'log/cal_logdir/atari_pong/dreamerv2/1/variables.pkl', config, obs_space, act_space, step)
+    'tensorboard/atari_pong_with_temperature_0-8/variables.pkl', config, obs_space, act_space, step)
     rssm_platt_cal, encoder_platt_cal = load_rssm_from_pkl(
     'log/cal_logdir_platt/atari_pong/dreamerv2/1/platt-variables.pkl', config, obs_space, act_space, step)
     
@@ -182,6 +208,15 @@ def main():
     plot_calibration_curve(bins, accs_raw, confs_raw, 'Raw Model')
     plot_calibration_curve(bins, accs_cal, confs_cal, 'Temperature Calibrated Model')
     plot_calibration_curve(bins, accs_platt_cal, confs_platt_cal, 'Platt Calibrated Model')
+
+    entropy_raw_avg, _ = compute_entropy(probs_raw)
+    entropy_cal_avg, _ = compute_entropy(probs_cal)
+    entropy_platt_avg, _ = compute_entropy(probs_platt_cal)
+    plot_entropy_bar(
+        [entropy_raw_avg, entropy_cal_avg, entropy_platt_avg],
+        ['Raw', 'Temperature', 'Platt'],
+        'Entropy Comparison (Raw vs Calibrated)'
+    )
 
 if __name__ == '__main__':
   main()

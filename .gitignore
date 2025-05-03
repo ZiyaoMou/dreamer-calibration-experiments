@@ -8,3 +8,5 @@ log/
 dreamerv2/__pycache__/
 slurm_train_output/
 slurm_cal_output/
+slurm_eval_output/
+tensorboard/

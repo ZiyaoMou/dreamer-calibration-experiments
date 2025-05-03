@@ -12,5 +12,5 @@
 
 nvidia-smi
 
-python3 dreamerv2/calibrate.py --logdir log/cal_logdir_platt_2/atari_pong/dreamerv2/1 \
-  --configs atari --task atari_pong
+python3 dreamerv2/calibrate.py --logdir log/cal_logdir_platt/atari_pong/dreamerv2/1 \
+  --configs atari --task atari_pong --rssm_calibrate_mode platt

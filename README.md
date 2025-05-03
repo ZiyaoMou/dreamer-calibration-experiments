@@ -49,6 +49,7 @@ defaults:
     calibrate_mode: 'global'/'off'/...
     temperature_init: 1.0
     temperature_schedule: 0.8
+```
 
 ### Supported Calibration Modes
 

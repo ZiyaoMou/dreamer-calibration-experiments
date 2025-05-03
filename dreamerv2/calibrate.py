@@ -26,176 +26,132 @@ import ruamel.yaml as yaml
 
 import agent
 import common
+import argparse
 
+import random
+import shutil
+
+def prefill_calib_from_existing(train_path, calib_path, ratio=0.2):
+    train_path = pathlib.Path(train_path)
+    calib_path = pathlib.Path(calib_path)
+    calib_path.mkdir(parents=True, exist_ok=True)
+
+    episode_files = sorted(train_path.glob("*.npz"))
+    num_to_copy = int(len(episode_files) * ratio)
+    selected = random.sample(episode_files, num_to_copy)
+
+    print(f"Copying {num_to_copy} episodes from {train_path} to {calib_path}...")
+
+    for file in selected:
+        dest = calib_path / file.name
+        shutil.copyfile(file, dest)
+
+    print("Done pre-filling calib_episodes.")
 
 def main():
+  configs = yaml.YAML(typ='safe', pure=True).load(
+      (pathlib.Path(sys.argv[0]).parent / 'configs.yaml').read_text()
+  )
 
-  configs = yaml.YAML(typ='safe', pure=True).load((
-      pathlib.Path(sys.argv[0]).parent / 'configs.yaml').read_text())
-  parsed, remaining = common.Flags(configs=['defaults']).parse(known_only=True)
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--rssm_calibrate_mode', type=str, default=None)
+  args, remaining = parser.parse_known_args()
+
+  parsed, leftover = common.Flags(configs=['defaults']).parse(argv=remaining, known_only=True)
   config = common.Config(configs['defaults'])
   for name in parsed.configs:
-    config = config.update(configs[name])
-  config = common.Flags(config).parse(remaining)
+      config = config.update(configs[name])
+
+  if args.rssm_calibrate_mode is not None:
+      config = config.update({'rssm.calibrate_mode': args.rssm_calibrate_mode})
+
+  config = common.Flags(config).parse(leftover)
 
   logdir = pathlib.Path(config.logdir).expanduser()
   logdir.mkdir(parents=True, exist_ok=True)
   config.save(logdir / 'config.yaml')
-  print(config, '\n')
-  print('Logdir', logdir)
 
   import tensorflow as tf
   tf.config.experimental_run_functions_eagerly(not config.jit)
-  message = 'No GPU found. To actually train on CPU remove this assert.'
-  assert tf.config.experimental.list_physical_devices('GPU'), message
   for gpu in tf.config.experimental.list_physical_devices('GPU'):
     tf.config.experimental.set_memory_growth(gpu, True)
-  assert config.precision in (16, 32), config.precision
   if config.precision == 16:
     from tensorflow.keras.mixed_precision import experimental as prec
     prec.set_policy(prec.Policy('mixed_float16'))
 
+  prefill_calib_from_existing(
+    train_path='log/raw_logdir/atari_pong/dreamerv2/1/train_episodes',
+    calib_path=logdir / 'calib_episodes',
+    ratio=0.2
+  )
+
   train_replay = common.Replay(logdir / 'calib_episodes', **dict(
-    capacity=1000,
-    minlen=config.dataset.length,
-    maxlen=config.dataset.length
-))
-  eval_replay = common.Replay(logdir / 'eval_episodes', **dict(
-      capacity=config.replay.capacity // 10,
+      capacity=1000,
       minlen=config.dataset.length,
       maxlen=config.dataset.length))
   step = common.Counter(train_replay.stats['total_steps'])
-  outputs = [
+  logger = common.Logger(step, [
       common.TerminalOutput(),
       common.JSONLOutput(logdir),
       common.TensorBoardOutput(logdir),
-  ]
-  logger = common.Logger(step, outputs, multiplier=config.action_repeat)
+  ], multiplier=config.action_repeat)
   metrics = collections.defaultdict(list)
 
-  should_train = common.Every(config.train_every)
-  should_log = common.Every(config.log_every)
-  should_video_train = common.Every(config.eval_every)
-  should_video_eval = common.Every(config.eval_every)
-  should_expl = common.Until(config.expl_until // config.action_repeat)
-
-  def make_env(mode):
+  def make_env():
     suite, task = config.task.split('_', 1)
-    if suite == 'dmc':
-      env = common.DMC(
-          task, config.action_repeat, config.render_size, config.dmc_camera)
-      env = common.NormalizeAction(env)
-    elif suite == 'atari':
-      env = common.Atari(
-          task, config.action_repeat, config.render_size,
-          config.atari_grayscale)
-      env = common.OneHotAction(env)
-    elif suite == 'crafter':
-      assert config.action_repeat == 1
-      outdir = logdir / 'crafter' if mode == 'train' else None
-      reward = bool(['noreward', 'reward'].index(task)) or mode == 'eval'
-      env = common.Crafter(outdir, reward)
+    if suite == 'atari':
+      env = common.Atari(task, config.action_repeat, config.render_size, config.atari_grayscale)
       env = common.OneHotAction(env)
     else:
       raise NotImplementedError(suite)
     env = common.TimeLimit(env, config.time_limit)
     return env
 
-  def per_episode(ep, mode):
-    length = len(ep['reward']) - 1
-    score = float(ep['reward'].astype(np.float64).sum())
-    print(f'{mode.title()} episode has {length} steps and return {score:.1f}.')
-    logger.scalar(f'{mode}_return', score)
-    logger.scalar(f'{mode}_length', length)
-    for key, value in ep.items():
-      if re.match(config.log_keys_sum, key):
-        logger.scalar(f'sum_{mode}_{key}', ep[key].sum())
-      if re.match(config.log_keys_mean, key):
-        logger.scalar(f'mean_{mode}_{key}', ep[key].mean())
-      if re.match(config.log_keys_max, key):
-        logger.scalar(f'max_{mode}_{key}', ep[key].max(0).mean())
-    should = {'train': should_video_train, 'eval': should_video_eval}[mode]
-    if should(step):
-      for key in config.log_keys_video:
-        logger.video(f'{mode}_policy_{key}', ep[key])
-    replay = dict(train=train_replay, eval=eval_replay)[mode]
-    logger.add(replay.stats, prefix=mode)
-    logger.write()
-
-  print('Create envs.')
-  num_eval_envs = min(config.envs, config.eval_eps)
-  if config.envs_parallel == 'none':
-    train_envs = [make_env('train') for _ in range(config.envs)]
-    eval_envs = [make_env('eval') for _ in range(num_eval_envs)]
-  else:
-    make_async_env = lambda mode: common.Async(
-        functools.partial(make_env, mode), config.envs_parallel)
-    train_envs = [make_async_env('train') for _ in range(config.envs)]
-    eval_envs = [make_async_env('eval') for _ in range(eval_envs)]
+  train_envs = [make_env() for _ in range(config.envs)]
   act_space = train_envs[0].act_space
   obs_space = train_envs[0].obs_space
   train_driver = common.Driver(train_envs)
-  train_driver.on_episode(lambda ep: per_episode(ep, mode='train'))
   train_driver.on_step(lambda tran, worker: step.increment())
   train_driver.on_step(train_replay.add_step)
   train_driver.on_reset(train_replay.add_step)
-  eval_driver = common.Driver(eval_envs)
-  eval_driver.on_episode(lambda ep: per_episode(ep, mode='eval'))
-  eval_driver.on_episode(eval_replay.add_episode)
 
-  prefill = max(0, config.prefill - train_replay.stats['total_steps'])
-  if prefill:
-    print(f'Prefill dataset ({prefill} steps).')
-    random_agent = common.RandomAgent(act_space)
-    train_driver(random_agent, steps=prefill, episodes=1)
-    eval_driver(random_agent, episodes=1)
-    train_driver.reset()
-    eval_driver.reset()
-
-  print('Create agent.')
   train_dataset = iter(train_replay.dataset(**config.dataset))
-  report_dataset = iter(train_replay.dataset(**config.dataset))
-  eval_dataset = iter(eval_replay.dataset(**config.dataset))
   agnt = agent.Agent(config, obs_space, act_space, step)
   train_agent = common.CarryOverState(agnt.train)
   train_agent(next(train_dataset))
+
   model_path = Path('log/raw_logdir/atari_pong/dreamerv2/1/variables.pkl')
-  print(model_path.exists())
   if model_path.exists():
     agnt.load(model_path)
   else:
     print('Pretrained model not found, exiting.')
     sys.exit(1)
-  train_policy = lambda *args: agnt.policy(
-      *args, mode='explore' if should_expl(step) else 'train')
-  eval_policy = lambda *args: agnt.policy(*args, mode='eval')
+
+  print("Freezing all weights except calibration parameters...")
+  for var in agnt.trainable_variables:
+    var._trainable = False
+  for var in agnt.wm.rssm.trainable_variables:
+    if any(x in var.name for x in ['temperature', 'platt_a', 'platt_b']):
+      var._trainable = True
+      print("Calibration trainable:", var.name)
 
   def train_step(tran, worker):
-    if should_train(step):
-      for _ in range(config.train_steps):
-        mets = train_agent(next(train_dataset))
-        [metrics[key].append(value) for key, value in mets.items()]
-    if should_log(step):
+    mets = train_agent(next(train_dataset))[1]
+    for k, v in mets.items():
+      metrics[k].append(v)
+    if int(step) % config.log_every == 0:
       for name, values in metrics.items():
         logger.scalar(name, np.array(values, np.float64).mean())
         metrics[name].clear()
-      logger.add(agnt.report(next(report_dataset)), prefix='train')
-      logger.write(fps=True)
+      logger.write()
+
   train_driver.on_step(train_step)
 
-  while step < config.steps:
-    logger.write()
-    print('Start evaluation.')
-    logger.add(agnt.report(next(eval_dataset)), prefix='eval')
-    eval_driver(eval_policy, episodes=config.eval_eps)
-    print('Start training.')
-    train_driver(train_policy, steps=config.eval_every)
-    agnt.save(logdir / 'platt-variables.pkl')
-  for env in train_envs + eval_envs:
-    try:
-      env.close()
-    except Exception:
-      pass
+  print("Start online calibration training.")
+  train_driver(lambda *args: agnt.policy(*args, mode='eval'), steps=config.steps)
+
+  save_name = f'{config.rssm.calibrate_mode}-calib-model.pkl'
+  agnt.save(logdir / save_name)
 
 if __name__ == '__main__':
   main()

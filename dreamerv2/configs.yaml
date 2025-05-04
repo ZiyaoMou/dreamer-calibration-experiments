@@ -41,7 +41,7 @@ defaults:
   pred_discount: True
 #  rssm: {ensemble: 1, hidden: 1024, deter: 1024, stoch: 32, discrete: 32, act: elu, norm: none, std_act: sigmoid2, min_std: 0.1}
   rssm: { ensemble: 1, hidden: 1024, deter: 1024, stoch: 32, discrete: 32,
-          act: elu, norm: none, std_act: sigmoid2, min_std: 0.1, calibrate_mode: 'platt',
+          act: elu, norm: none, std_act: sigmoid2, min_std: 0.1, calibrate_mode: 'off',
           temperature_init: 1.0,
           temperature_schedule: 0.8 }
   encoder: {mlp_keys: '.*', cnn_keys: '.*', act: elu, norm: none, cnn_depth: 48, cnn_kernels: [4, 4, 4, 4], mlp_layers: [400, 400, 400, 400]}
@@ -98,7 +98,7 @@ atari:
   clip_rewards: tanh
   rssm: {hidden: 600,
      deter: 600,
-     calibrate_mode: 'platt',
+     calibrate_mode: 'off',
      temperature_init: 1.0,
      temperature_schedule: 0.8}
   model_opt.lr: 2e-4

@@ -71,6 +71,8 @@ def main():
   logdir.mkdir(parents=True, exist_ok=True)
   config.save(logdir / 'config.yaml')
 
+  print(config.rssm.calibrate_mode)
+
   import tensorflow as tf
   tf.config.experimental_run_functions_eagerly(not config.jit)
   for gpu in tf.config.experimental.list_physical_devices('GPU'):
@@ -97,6 +99,26 @@ def main():
   ], multiplier=config.action_repeat)
   metrics = collections.defaultdict(list)
 
+  def train_step(tran, worker):
+    mets = train_agent(next(train_dataset))
+    for k, v in mets.items():
+      metrics[k].append(v)
+    if int(step) % config.log_every == 0:
+      for name, values in metrics.items():
+        logger.scalar(name, np.array(values, np.float64).mean())
+        metrics[name].clear()
+      logger.write()
+      if config.rssm.calibrate_mode == 'global':
+        temp_var = [v for v in agnt.wm.rssm.trainable_variables if 'temperature' in v.name]
+        if temp_var:
+          print(f"Step {int(step)} | Temperature: {temp_var[0].numpy():.4f}")
+
+      elif config.rssm.calibrate_mode == 'platt':
+        platt_a = [v for v in agnt.wm.rssm.trainable_variables if 'platt_a' in v.name]
+        platt_b = [v for v in agnt.wm.rssm.trainable_variables if 'platt_b' in v.name]
+        if platt_a and platt_b:
+          print(f"Step {int(step)} | Platt a: {platt_a[0].numpy():.4f} | b: {platt_b[0].numpy():.4f}")
+
   def make_env():
     suite, task = config.task.split('_', 1)
     if suite == 'atari':
@@ -114,6 +136,7 @@ def main():
   train_driver.on_step(lambda tran, worker: step.increment())
   train_driver.on_step(train_replay.add_step)
   train_driver.on_reset(train_replay.add_step)
+  train_driver.on_step(train_step)
 
   train_dataset = iter(train_replay.dataset(**config.dataset))
   agnt = agent.Agent(config, obs_space, act_space, step)
@@ -134,21 +157,10 @@ def main():
     if any(x in var.name for x in ['temperature', 'platt_a', 'platt_b']):
       var._trainable = True
       print("Calibration trainable:", var.name)
-
-  def train_step(tran, worker):
-    mets = train_agent(next(train_dataset))[1]
-    for k, v in mets.items():
-      metrics[k].append(v)
-    if int(step) % config.log_every == 0:
-      for name, values in metrics.items():
-        logger.scalar(name, np.array(values, np.float64).mean())
-        metrics[name].clear()
-      logger.write()
-
-  train_driver.on_step(train_step)
-
+  
   print("Start online calibration training.")
-  train_driver(lambda *args: agnt.policy(*args, mode='eval'), steps=config.steps)
+  while int(step) < config.steps:
+      train_driver(lambda *args: agnt.policy(*args, mode='eval'), steps=config.train_every)
 
   save_name = f'{config.rssm.calibrate_mode}-calib-model.pkl'
   agnt.save(logdir / save_name)

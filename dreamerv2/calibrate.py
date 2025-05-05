@@ -30,22 +30,35 @@ import argparse
 import random
 import shutil
 
-def prefill_calib_from_existing(train_path, calib_path, ratio=0.2):
+def prefill_calib_eval_split(train_path, calib_path, eval_path, calib_ratio=0.2, eval_ratio=0.1, seed=42):
     train_path = pathlib.Path(train_path)
     calib_path = pathlib.Path(calib_path)
+    eval_path = pathlib.Path(eval_path)
     calib_path.mkdir(parents=True, exist_ok=True)
+    eval_path.mkdir(parents=True, exist_ok=True)
 
     episode_files = sorted(train_path.glob("*.npz"))
-    num_to_link = int(len(episode_files) * ratio)
-    selected = random.sample(episode_files, num_to_link)
+    total = len(episode_files)
+    random.seed(seed)
+    random.shuffle(episode_files)
 
-    print(f"Creating {num_to_link} symlinks from {train_path} to {calib_path}...")
-    for file in selected:
-        dest = calib_path / file.name
-        if dest.exists():
-            dest.unlink()
-        os.symlink(file.resolve(), dest)
-    print("Done pre-filling calib_episodes with symlinks.")
+    num_calib = int(total * calib_ratio)
+    num_eval = int(total * eval_ratio)
+    calib_files = episode_files[:num_calib]
+    eval_files = episode_files[num_calib:num_calib+num_eval]
+
+    def symlink_files(files, dest):
+        for file in files:
+            dest_file = dest / file.name
+            if dest_file.exists():
+                dest_file.unlink()
+            os.symlink(file.resolve(), dest_file)
+
+    print(f"Creating {len(calib_files)} calibration symlinks...")
+    symlink_files(calib_files, calib_path)
+    print(f"Creating {len(eval_files)} evaluation symlinks...")
+    symlink_files(eval_files, eval_path)
+    print("Done splitting calibration and evaluation sets.")
 
 def main():
   # Load config
@@ -77,13 +90,21 @@ def main():
     prec.set_policy(prec.Policy('mixed_float16'))
 
   # Prefill calib episodes
-  prefill_calib_from_existing(
+  prefill_calib_eval_split(
     train_path='log/raw_logdir/atari_pong/dreamerv2/1/train_episodes',
     calib_path=logdir / 'calib_episodes',
-    ratio=0.2)
+    eval_path=logdir / 'eval_episodes',
+    calib_ratio=0.2,
+    eval_ratio=0.1
+    )
 
   train_replay = common.Replay(logdir / 'calib_episodes', capacity=1000,
       minlen=config.dataset.length, maxlen=config.dataset.length)
+
+  eval_replay = common.Replay(logdir / 'eval_episodes', capacity=1000,
+    minlen=config.dataset.length, maxlen=config.dataset.length)
+  
+  eval_dataset = iter(eval_replay.dataset(**config.dataset))
   
   step = common.Counter(train_replay.stats['total_steps'])
   logger = common.Logger(step, [
@@ -152,6 +173,11 @@ def main():
   agnt = agent.Agent(config, obs_space, act_space, step)
   train_agent = common.CarryOverState(agnt.train)
   train_agent(next(train_dataset))
+  should_expl = common.Until(config.expl_until // config.action_repeat)
+  train_policy = lambda *args: agnt.policy(
+      *args, mode='explore' if should_expl(step) else 'train')
+  eval_policy = lambda *args: agnt.policy(*args, mode='eval')
+
 
   model_path = Path('log/raw_logdir/atari_pong/dreamerv2/1/variables.pkl')
   if model_path.exists():
@@ -169,14 +195,21 @@ def main():
       print("Calibration trainable:", var.name)
 
   print("Start online calibration training.")
-  while int(step) < config.steps:
-    train_driver(lambda *args: agnt.policy(*args, mode='eval'), steps=config.train_every)
-    if int(step) % config.eval_every == 0:
-      print(f"Running evaluation at step {int(step)}...")
-      eval_driver(lambda *args: agnt.policy(*args, mode='eval'), episodes=config.eval_eps)
 
-  save_name = f'{config.rssm.calibrate_mode}-calib-model.pkl'
-  agnt.save(logdir / save_name)
+  while int(step) < config.steps:
+    print('Start evaluation.')
+    logger.add(agnt.report(next(eval_dataset)), prefix='eval')
+    eval_driver(eval_policy, episodes=config.eval_eps)
+    print('Start training.')
+    train_driver(train_policy, steps=config.eval_every)
+    agnt.save(logdir / 'variables.pkl')
+    save_name = f'{config.rssm.calibrate_mode}-calib-model.pkl'
+    agnt.save(logdir / save_name)
+  for env in train_envs + eval_envs:
+    try:
+      env.close()
+    except Exception:
+      pass
 
 if __name__ == '__main__':
   main()
